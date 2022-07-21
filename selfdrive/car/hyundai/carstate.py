@@ -38,6 +38,8 @@ class CarState(CarStateBase):
     if self.CP.carFingerprint in HDA2_CAR:
       return self.update_hda2(cp, cp_cam)
 
+    metric = not cp.vl["CLU11"]["CF_Clu_SPEED_UNIT"]
+
     ret = car.CarState.new_message()
 
     ret.doorOpen = any([cp.vl["CGW1"]["CF_Gway_DrvDrSw"], cp.vl["CGW1"]["CF_Gway_AstDrSw"],
@@ -52,6 +54,7 @@ class CarState(CarStateBase):
       cp.vl["WHL_SPD11"]["WHL_SPD_RR"],
     )
     ret.vEgoRaw = (ret.wheelSpeeds.fl + ret.wheelSpeeds.fr + ret.wheelSpeeds.rl + ret.wheelSpeeds.rr) / 4.
+    ret.vEgoCluster = cp.vl["CLU15"]["CF_Clu_VehicleSpeed"] if metric else cp.vl["CLU15"]["CF_Clu_VehicleSpeed2"]
     ret.vEgo, ret.aEgo = self.update_speed_kf(ret.vEgoRaw)
 
     ret.standstill = ret.vEgoRaw < 0.1
@@ -76,7 +79,7 @@ class CarState(CarStateBase):
       ret.cruiseState.available = cp.vl["SCC11"]["MainMode_ACC"] == 1
       ret.cruiseState.enabled = cp.vl["SCC12"]["ACCMode"] != 0
       ret.cruiseState.standstill = cp.vl["SCC11"]["SCCInfoDisplay"] == 4.
-      speed_conv = CV.MPH_TO_MS if cp.vl["CLU11"]["CF_Clu_SPEED_UNIT"] else CV.KPH_TO_MS
+      speed_conv = CV.KPH_TO_MS if metric else CV.MPH_TO_MS
       ret.cruiseState.speed = cp.vl["SCC11"]["VSetDis"] * speed_conv
 
     # TODO: Find brake pressure
@@ -219,6 +222,9 @@ class CarState(CarStateBase):
       ("CF_Clu_AmpInfo", "CLU11"),
       ("CF_Clu_AliveCnt1", "CLU11"),
 
+      ("CF_Clu_VehicleSpeed", "CLU15"),
+      ("CF_Clu_VehicleSpeed2", "CLU15"),
+
       ("ACCEnable", "TCS13"),
       ("ACC_REQ", "TCS13"),
       ("DriverBraking", "TCS13"),
@@ -243,6 +249,7 @@ class CarState(CarStateBase):
       ("TCS13", 50),
       ("TCS15", 10),
       ("CLU11", 50),
+      ("CLU15", 4),
       ("ESP12", 100),
       ("CGW1", 10),
       ("CGW2", 5),
