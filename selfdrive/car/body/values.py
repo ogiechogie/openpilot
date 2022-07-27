@@ -27,7 +27,7 @@ CAR_INFO: Dict[str, CarInfo] = {
 FW_VERSIONS = {
   CAR.BODY: {
     (Ecu.engine, 0x720, None): [
-      b'0.0.02',
+      # b'0.0.02',
       b'ELECTRIC0'
     ],
     (Ecu.debug, 0x721, None): [
@@ -36,7 +36,7 @@ FW_VERSIONS = {
   },
   CAR.BODY_KNEE: {
     (Ecu.engine, 0x720, None): [
-      b'0.0.02',
+      # b'0.0.02',
       b'ELECTRIC1'
     ],
     (Ecu.debug, 0x721, None): [
