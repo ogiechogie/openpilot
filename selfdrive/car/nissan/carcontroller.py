@@ -1,18 +1,16 @@
 from cereal import car
 from common.numpy_fast import clip, interp
 from opendbc.can.packer import CANPacker
+from selfdrive.car.interfaces import CarControllerBase
 from selfdrive.car.nissan import nissancan
 from selfdrive.car.nissan.values import CAR, CarControllerParams
 
 VisualAlert = car.CarControl.HUDControl.VisualAlert
 
 
-class CarController:
+class CarController(CarControllerBase):
   def __init__(self, dbc_name, CP, VM):
-    self.CP = CP
-    self.car_fingerprint = CP.carFingerprint
-    self.frame = 0
-
+    super().__init__(dbc_name, CP, VM)
     self.lkas_max_torque = 0
     self.last_angle = 0
 

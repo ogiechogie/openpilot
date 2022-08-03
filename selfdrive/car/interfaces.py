@@ -321,7 +321,7 @@ class CarStateBase(ABC):
   def parse_gear_shifter(gear: Optional[str]) -> car.CarState.GearShifter:
     if gear is None:
       return GearShifter.unknown
-    
+
     d: Dict[str, car.CarState.GearShifter] = {
         'P': GearShifter.park, 'PARK': GearShifter.park,
         'R': GearShifter.reverse, 'REVERSE': GearShifter.reverse,
@@ -350,6 +350,16 @@ class CarStateBase(ABC):
   @staticmethod
   def get_loopback_can_parser(CP):
     return None
+
+
+class CarControllerBase(ABC):
+  def __init__(self, dbc_name, CP, VM):
+    self.CP = CP
+    self.VM = VM
+    self.car_fingerprint = CP.carFingerprint
+    self.frame = 0
+    self.apply_steer_last = 0
+    # TODO: do packer
 
 
 # interface-specific helpers

@@ -3,6 +3,7 @@ from common.numpy_fast import clip, interp
 from opendbc.can.packer import CANPacker
 from selfdrive.car.ford import fordcan
 from selfdrive.car.ford.values import CarControllerParams
+from selfdrive.car.interfaces import CarControllerBase
 
 VisualAlert = car.CarControl.HUDControl.VisualAlert
 
@@ -17,14 +18,10 @@ def apply_ford_steer_angle_limits(apply_steer, apply_steer_last, vEgo):
   return apply_steer
 
 
-class CarController:
+class CarController(CarControllerBase):
   def __init__(self, dbc_name, CP, VM):
-    self.CP = CP
-    self.VM = VM
+    super().__init__(dbc_name, CP, VM)
     self.packer = CANPacker(dbc_name)
-    self.frame = 0
-
-    self.apply_steer_last = 0
     self.main_on_last = False
     self.lkas_enabled_last = False
     self.steer_alert_last = False

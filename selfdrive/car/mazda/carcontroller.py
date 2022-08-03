@@ -1,19 +1,18 @@
 from cereal import car
 from opendbc.can.packer import CANPacker
 from selfdrive.car import apply_std_steer_torque_limits
+from selfdrive.car.interfaces import CarControllerBase
 from selfdrive.car.mazda import mazdacan
 from selfdrive.car.mazda.values import CarControllerParams, Buttons
 
 VisualAlert = car.CarControl.HUDControl.VisualAlert
 
 
-class CarController:
+class CarController(CarControllerBase):
   def __init__(self, dbc_name, CP, VM):
-    self.CP = CP
-    self.apply_steer_last = 0
+    super().__init__(dbc_name, CP, VM)
     self.packer = CANPacker(dbc_name)
     self.brake_counter = 0
-    self.frame = 0
 
   def update(self, CC, CS):
     can_sends = []

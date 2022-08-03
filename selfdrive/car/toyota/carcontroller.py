@@ -1,6 +1,7 @@
 from cereal import car
 from common.numpy_fast import clip, interp
 from selfdrive.car import apply_toyota_steer_torque_limits, create_gas_interceptor_command, make_can_msg
+from selfdrive.car.interfaces import CarControllerBase
 from selfdrive.car.toyota.toyotacan import create_steer_command, create_ui_command, \
                                            create_accel_command, create_acc_cancel_command, \
                                            create_fcw_command, create_lta_steer_command
@@ -11,12 +12,10 @@ from opendbc.can.packer import CANPacker
 VisualAlert = car.CarControl.HUDControl.VisualAlert
 
 
-class CarController:
+class CarController(CarControllerBase):
   def __init__(self, dbc_name, CP, VM):
-    self.CP = CP
+    super().__init__(dbc_name, CP, VM)
     self.torque_rate_limits = CarControllerParams(self.CP)
-    self.frame = 0
-    self.last_steer = 0
     self.alert_active = False
     self.last_standstill = False
     self.standstill_req = False
@@ -50,7 +49,7 @@ class CarController:
 
     # steer torque
     new_steer = int(round(actuators.steer * CarControllerParams.STEER_MAX))
-    apply_steer = apply_toyota_steer_torque_limits(new_steer, self.last_steer, CS.out.steeringTorqueEps, self.torque_rate_limits)
+    apply_steer = apply_toyota_steer_torque_limits(new_steer, self.apply_steer_last, CS.out.steeringTorqueEps, self.torque_rate_limits)
 
     if not CC.latActive:
       apply_steer = 0
@@ -70,7 +69,7 @@ class CarController:
       # pcm entered standstill or it's disabled
       self.standstill_req = False
 
-    self.last_steer = apply_steer
+    self.apply_steer_last = apply_steer
     self.last_standstill = CS.out.standstill
 
     can_sends = []

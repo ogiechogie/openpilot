@@ -1,15 +1,13 @@
 from opendbc.can.packer import CANPacker
 from selfdrive.car import apply_std_steer_torque_limits
+from selfdrive.car.interfaces import CarControllerBase
 from selfdrive.car.subaru import subarucan
 from selfdrive.car.subaru.values import DBC, GLOBAL_GEN2, PREGLOBAL_CARS, CarControllerParams
 
 
-class CarController:
+class CarController(CarControllerBase):
   def __init__(self, dbc_name, CP, VM):
-    self.CP = CP
-    self.apply_steer_last = 0
-    self.frame = 0
-
+    super().__init__(dbc_name, CP, VM)
     self.es_lkas_cnt = -1
     self.es_distance_cnt = -1
     self.es_dashstatus_cnt = -1

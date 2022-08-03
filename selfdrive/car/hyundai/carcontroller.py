@@ -6,6 +6,7 @@ from opendbc.can.packer import CANPacker
 from selfdrive.car import apply_std_steer_torque_limits
 from selfdrive.car.hyundai import hda2can, hyundaican
 from selfdrive.car.hyundai.values import Buttons, CarControllerParams, HDA2_CAR, CAR
+from selfdrive.car.interfaces import CarControllerBase
 
 VisualAlert = car.CarControl.HUDControl.VisualAlert
 LongCtrlState = car.CarControl.Actuators.LongControlState
@@ -34,15 +35,12 @@ def process_hud_alert(enabled, fingerprint, hud_control):
   return sys_warning, sys_state, left_lane_warning, right_lane_warning
 
 
-class CarController:
+class CarController(CarControllerBase):
   def __init__(self, dbc_name, CP, VM):
-    self.CP = CP
+    super().__init__(dbc_name, CP, VM)
     self.params = CarControllerParams(CP)
     self.packer = CANPacker(dbc_name)
-    self.frame = 0
 
-    self.apply_steer_last = 0
-    self.car_fingerprint = CP.carFingerprint
     self.last_button_frame = 0
     self.accel = 0
 
