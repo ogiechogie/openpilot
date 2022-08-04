@@ -33,6 +33,7 @@ class CarState(CarStateBase):
     self.buttons_counter = 0
 
     self.params = CarControllerParams(CP)
+    self.CLU15_seen = False
 
   def update(self, cp, cp_cam):
     if self.CP.carFingerprint in HDA2_CAR:
@@ -58,8 +59,15 @@ class CarState(CarStateBase):
     )
     ret.vEgoRaw = (ret.wheelSpeeds.fl + ret.wheelSpeeds.fr + ret.wheelSpeeds.rl + ret.wheelSpeeds.rr) / 4.
     # ret.vEgoCluster = (cp.vl["CLU15"]["CF_Clu_VehicleSpeed"] * CV.KPH_TO_MS) if metric else (cp.vl["CLU15"]["CF_Clu_VehicleSpeed2"] * CV.MPH_TO_MS)
-    ret.vEgoCluster = cp.vl["CLU15"]["CF_Clu_VehicleSpeed2"] * speed_conv
+    ret.vEgoCluster = cp.vl["CLU15"]["CF_Clu_VehicleSpeed"] * CV.KPH_TO_MS
     ret.vEgo, ret.aEgo = self.update_speed_kf(ret.vEgoRaw)
+
+    if len(cp.vl_all["CLU15"]):
+      self.CLU15_seen = True
+
+    # if ret.vEgo > 1.2:
+    #   if ret.vEgoCluster == 0 and self.CLU15_seen:
+    #     raise Exception('{}: vEgo is {}, vEgoCluster is {}'.format(self.CP.carFingerprint, ret.vEgo, ret.vEgoCluster))
 
     ret.standstill = ret.vEgoRaw < 0.1
 
