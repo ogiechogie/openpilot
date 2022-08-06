@@ -94,6 +94,10 @@ class CarController:
     if (self.frame % 3 == 0 and self.CP.openpilotLongitudinalControl) or pcm_cancel_cmd:
       lead = hud_control.leadVisible or CS.out.vEgo < 12.  # at low speed we always assume the lead is present so ACC can be engaged
 
+      # Stock ACC stops raising acceleration when coming to a stop and lets the car come to a smooth controlled stop
+      if CS.out.vEgo < 2.5 and actuators.futureSpeed < self.CP.vEgoStopping:
+        pcm_accel_cmd = min(pcm_accel_cmd, -0.4)
+
       # Lexus IS uses a different cancellation message
       if pcm_cancel_cmd and self.CP.carFingerprint in (CAR.LEXUS_IS, CAR.LEXUS_RC):
         can_sends.append(create_acc_cancel_command(self.packer))
