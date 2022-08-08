@@ -236,8 +236,8 @@ class CarInterface(CarInterfaceBase):
       ret.stoppingDecelRate = 0.3  # reach stopping target smoothly
       ret.vEgoStopping = 0.3
       ret.vEgoStarting = 0.3
-      ret.longitudinalActuatorDelayLowerBound = 0.5
-      ret.longitudinalActuatorDelayUpperBound = 0.5
+      ret.longitudinalActuatorDelayLowerBound = 0.3
+      ret.longitudinalActuatorDelayUpperBound = 0.3
     else:
       set_long_tune(ret.longitudinalTuning, LongTunes.TSS)
 
