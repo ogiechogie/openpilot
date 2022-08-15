@@ -601,7 +601,8 @@ class Controls:
       lac_log = log.ControlsState.LateralDebugState.new_message()
       if self.sm.rcv_frame['testJoystick'] > 0:
         if CC.longActive:
-          actuators.accel = 4.0*clip(self.sm['testJoystick'].axes[0], -1, 1)
+          actuators.accel = 4.0 * clip(self.sm['testJoystick'].axes[0], -1, 1)
+          actuators.futureAccel = actuators.accel
 
         if CC.latActive:
           steer = clip(self.sm['testJoystick'].axes[1], -1, 1)
