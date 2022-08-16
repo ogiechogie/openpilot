@@ -146,7 +146,7 @@ class CarInterfaceBase(ABC):
     tune.torque.ki = 0.1
     tune.torque.friction = params['FRICTION']
     tune.torque.slope = params['LAT_ACCEL_FACTOR']
-    tune.torque.intercept = 0.0
+    tune.torque.offset = 0.0
     tune.torque.steeringAngleDeadzoneDeg = steering_angle_deadzone_deg
 
   @abstractmethod

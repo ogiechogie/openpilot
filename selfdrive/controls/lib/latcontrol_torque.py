@@ -33,14 +33,14 @@ class LatControlTorque(LatControl):
     self.ki_factor = CP.lateralTuning.torque.ki
     self.kf_factor = CP.lateralTuning.torque.kf
 
-    self.update_params(CP.lateralTuning.torque.slope, CP.lateralTuning.torque.intercept, CP.lateralTuning.torque.friction)
+    self.update_params(CP.lateralTuning.torque.slope, CP.lateralTuning.torque.offset, CP.lateralTuning.torque.friction)
 
-  def update_params(self, slope, intercept, friction):
+  def update_params(self, slope, offset, friction):
     kp = self.kp_factor / slope
     kf = self.kf_factor / slope
     ki = self.ki_factor / slope
     self.friction = friction
-    self.intercept = intercept
+    self.offset = offset
     self.kf = kf
     self.pid.update_gains(kp, ki, kf)
 
