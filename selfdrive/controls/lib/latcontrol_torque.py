@@ -3,7 +3,7 @@ import math
 from cereal import log
 from common.numpy_fast import interp
 from selfdrive.controls.lib.latcontrol import LatControl, MIN_STEER_SPEED
-from selfdrive.controls.lib.pid import PIDController
+from selfdrive.controls.lib.pid import PIDControllerVariableGains
 from selfdrive.controls.lib.drive_helpers import apply_deadzone
 from selfdrive.controls.lib.vehicle_model import ACCELERATION_DUE_TO_GRAVITY
 
@@ -25,13 +25,25 @@ FRICTION_THRESHOLD = 0.2
 class LatControlTorque(LatControl):
   def __init__(self, CP, CI):
     super().__init__(CP, CI)
-    self.pid = PIDController(CP.lateralTuning.torque.kp, CP.lateralTuning.torque.ki,
-                             k_f=CP.lateralTuning.torque.kf, pos_limit=self.steer_max, neg_limit=-self.steer_max)
+    self.pid = PIDControllerVariableGains(pos_limit=self.steer_max, neg_limit=-self.steer_max)
     self.get_steer_feedforward = CI.get_steer_feedforward_function()
     self.use_steering_angle = CP.lateralTuning.torque.useSteeringAngle
-    self.friction = CP.lateralTuning.torque.friction
-    self.kf = CP.lateralTuning.torque.kf
     self.steering_angle_deadzone_deg = CP.lateralTuning.torque.steeringAngleDeadzoneDeg
+    self.kp_factor = CP.lateralTuning.torque.kp
+    self.ki_factor = CP.lateralTuning.torque.ki
+    self.kf_factor = CP.lateralTuning.torque.kf
+
+    self.update_params(CP.lateralTuning.torque.slope, CP.lateralTuning.torque.intercept, CP.lateralTuning.torque.friction)
+
+  def update_params(self, slope, intercept, friction):
+    kp = self.kp_factor / slope
+    kf = self.kf_factor / slope
+    ki = self.ki_factor / slope
+    self.friction = friction
+    self.intercept = intercept
+    self.kf = kf
+    self.pid.update_gains(kp, ki, kf)
+
 
   def update(self, active, CS, VM, params, last_actuators, steer_limited, desired_curvature, desired_curvature_rate, llk):
     pid_log = log.ControlsState.LateralTorqueState.new_message()
@@ -51,10 +63,9 @@ class LatControlTorque(LatControl):
       desired_lateral_accel = desired_curvature * CS.vEgo ** 2
 
       # desired rate is the desired rate of change in the setpoint, not the absolute desired curvature
-      #desired_lateral_jerk = desired_curvature_rate * CS.vEgo ** 2
+      # desired_lateral_jerk = desired_curvature_rate * CS.vEgo ** 2
       actual_lateral_accel = actual_curvature * CS.vEgo ** 2
       lateral_accel_deadzone = curvature_deadzone * CS.vEgo ** 2
-
 
       low_speed_factor = interp(CS.vEgo, [0, 10, 20], [500, 500, 200])
       setpoint = desired_lateral_accel + low_speed_factor * desired_curvature
