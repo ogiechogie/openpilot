@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Union
 
 from cereal import car
 from selfdrive.car import dbc_dict
@@ -19,9 +19,9 @@ class CAR:
   BODY = "COMMA BODY"
   BODY_KNEE = "COMMA BODY WITH KNEE"
 
-CAR_INFO: Dict[str, CarInfo] = {
+CAR_INFO: Dict[str, Union[CarInfo, None]] = {
   CAR.BODY: CarInfo("comma body", package="All", harness=Harness.none),
-  CAR.BODY_KNEE: CarInfo("comma body + knee", package="All", harness=Harness.none),
+  CAR.BODY_KNEE: None,
 }
 
 FW_VERSIONS = {
