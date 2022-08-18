@@ -99,8 +99,12 @@ class CarController:
       # Toyota is hesitant to respond to acceleration requests if PERMIT_BRAKING is 1
       # ORIG: permit_braking = int(CS.out.vEgo < 0.2 or pcm_accel_cmd <= 0.1 or actuators.futureAccel < 0.6)
 
+      pcm_accel_cmd = actuators.accel
+      if CC.longActive and CS.out.vEgo < MIN_ACC_SPEED and actuators.accelTarget > 0:
+        pcm_accel_cmd = interp(actuators.accelTarget, [0, 0.6], [pcm_accel_cmd, actuators.futureAccel])
+
       coasting_accel = CC.orientationNED[1] * ACCELERATION_DUE_TO_GRAVITY + 0.2  # offset threshold
-      permit_braking = int(CS.out.vEgo < 0.1 or actuators.accel < coasting_accel or actuators.futureAccel < coasting_accel)
+      permit_braking = int(CS.out.vEgo < 0.1 or pcm_accel_cmd < coasting_accel or actuators.futureAccel < coasting_accel)
 
       # Lexus IS uses a different cancellation message
       if pcm_cancel_cmd and self.CP.carFingerprint in (CAR.LEXUS_IS, CAR.LEXUS_RC):

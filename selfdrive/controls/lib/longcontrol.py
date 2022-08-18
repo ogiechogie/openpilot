@@ -55,12 +55,13 @@ class LongControl:
     self.pid.reset()
     self.v_pid = v_pid
 
-  def update(self, active, CS, long_plan, accel_limits, t_since_plan):
+  def update(self, active, CS, long_plan, accel_limits, t_since_plan, actuators):
     """Update longitudinal control. This updates the state machine and runs a PID loop"""
     # Interp control trajectory
     speeds = long_plan.speeds
     accels = long_plan.accels
     if len(speeds) == len(accels) == CONTROL_N:
+      accels = long_plan.accels
       v_target = interp(t_since_plan, T_IDXS[:CONTROL_N], speeds)
       a_target = interp(t_since_plan, T_IDXS[:CONTROL_N], accels)
 
@@ -75,8 +76,8 @@ class LongControl:
       a_target_future = accels[-1]
     else:
       v_target = 0.0
-      v_target_future = 0.0
       a_target = 0.0
+      v_target_future = 0.0
       a_target_future = 0.0
 
     # TODO: This check is not complete and needs to be enforced by MPC
@@ -121,6 +122,10 @@ class LongControl:
       self.reset(CS.vEgo)
 
     self.last_output_accel = output_accel
-    final_accel = clip(output_accel, accel_limits[0], accel_limits[1])
 
-    return final_accel, a_target_future
+    # fill actuators
+    actuators.accel = clip(output_accel, accel_limits[0], accel_limits[1])
+    actuators.futureSpeed = v_target_future
+    actuators.futureAccel = a_target_future
+    actuators.accelTarget = a_target
+    actuators.speedTarget = v_target
