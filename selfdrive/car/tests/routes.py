@@ -24,13 +24,13 @@ non_tested_cars = [
   HYUNDAI.ELANTRA_GT_I30,
   HYUNDAI.GENESIS_G90,
   HYUNDAI.KIA_OPTIMA_H,
-  COMMA.BODY_KNEE,
 ]
 
 TestRoute = namedtuple('TestRoute', ['route', 'car_model', 'segment'], defaults=(None,))
 
 routes = [
-  TestRoute("efdf9af95e71cd84|2022-05-13--19-03-31", COMMA.BODY),
+  TestRoute("ceacc4d097850b24|2022-08-17--19-48-37", COMMA.BODY),
+  TestRoute("ceacc4d097850b24|2022-08-17--19-36-08", COMMA.BODY_KNEE),
 
   TestRoute("0c94aa1e1296d7c6|2021-05-05--19-48-37", CHRYSLER.JEEP_CHEROKEE),
   TestRoute("91dfedae61d7bd75|2021-05-22--20-07-52", CHRYSLER.JEEP_CHEROKEE_2019),
