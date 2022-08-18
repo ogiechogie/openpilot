@@ -55,7 +55,7 @@ export PYTHONPATH="$BUILD_DIR"
 export CERT=/data/pandaextra/certs/release
 RELEASE=1 scons -j$(nproc)
 
-# Ensure no submodules in release
+# Ensure no submodules in release branches
 if test "$(git submodule--helper list | wc -l)" -gt "0"; then
   echo "submodules found:"
   git submodule--helper list
@@ -84,12 +84,7 @@ touch prebuilt
 git add -f .
 git commit --amend -m "openpilot v$VERSION"
 
-# Run tests
-cd $BUILD_DIR
-RELEASE=1 selfdrive/test/test_onroad.py
-#selfdrive/manager/test/test_manager.py
-selfdrive/car/tests/test_car_interfaces.py
-
+# Push
 if [ ! -z "$PUSH" ]; then
   echo "[-] pushing T=$SECONDS"
   git push -f origin $RELEASE_BRANCH
