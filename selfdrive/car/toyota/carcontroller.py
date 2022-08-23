@@ -102,7 +102,8 @@ class CarController:
       # pcm_accel_cmd = actuators.accel
       if CC.longActive:  # and CS.out.vEgo < MIN_ACC_SPEED:
         coasting_accel = CC.orientationNED[1] * ACCELERATION_DUE_TO_GRAVITY + 0.2
-        pcm_accel_cmd = interp(pcm_accel_cmd, [coasting_accel, coasting_accel + 0.4], [pcm_accel_cmd, actuators.futureAccel])
+        accel_offset = max(pcm_accel_cmd - actuators.futureAccel, 0)
+        pcm_accel_cmd = interp(pcm_accel_cmd, [coasting_accel, coasting_accel + 0.4], [pcm_accel_cmd, actuators.futureAccel + accel_offset])
 
       permit_braking = 1  # int(CS.out.vEgo < 0.1 or pcm_accel_cmd < coasting_accel or actuators.futureAccel < coasting_accel)
 
