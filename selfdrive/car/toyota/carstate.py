@@ -106,12 +106,12 @@ class CarState(CarStateBase):
       ret.cruiseState.speedCluster = cluster_set_speed * conversion_factor
 
     # ego dash speed factor is dynamic across the speed range
-    dash_speed_factor = ret.cruiseState.speedCluster / max(ret.cruiseState.speed, 0.01)
-    print(dash_speed_factor)
+    # dash_speed_factor = ret.cruiseState.speedCluster / max(ret.cruiseState.speed, 0.01)
+    # print(dash_speed_factor)
 
     # native_unit = CV.MS_TO_KPH if is_metric else CV.MS_TO_MPH
-    # ret.vEgoCluster = math.floor(ret.vEgoRaw * native_unit * 1.05) / native_unit
-    ret.vEgoCluster = ret.vEgoRaw * dash_speed_factor
+    ret.vEgoCluster = ret.vEgoRaw * 1.05
+    # ret.vEgoCluster = ret.vEgoRaw * dash_speed_factor
 
     cp_acc = cp_cam if self.CP.carFingerprint in (TSS2_CAR - RADAR_ACC_CAR) else cp
 
