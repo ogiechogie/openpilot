@@ -83,3 +83,8 @@ lenv.Program('_modeld', [
     "modeld.cc",
     "models/driving.cc",
   ]+common_model, LIBS=libs + transformations)
+
+lenv.Program('_bodymodeld', [
+    "bodymodeld.cc",
+    "models/body.cc",
+  ]+common_model, LIBS=libs)
