@@ -1,5 +1,6 @@
 import numpy as np
 
+import cereal.messaging as messaging
 from common.realtime import DT_CTRL
 from opendbc.can.packer import CANPacker
 from selfdrive.car.body import bodycan
@@ -18,6 +19,7 @@ class CarController:
   def __init__(self, dbc_name, CP, VM):
     self.frame = 0
     self.packer = CANPacker(dbc_name)
+    self.sm = messaging.SubMaster(['driverStateV2'], poll=['driverStateV2'])
 
     # Speed, balance and turn PIDs
     self.speed_pid = PIDController(0.115, k_i=0.23, rate=1/DT_CTRL)
@@ -26,6 +28,9 @@ class CarController:
 
     self.torque_r_filtered = 0.
     self.torque_l_filtered = 0.
+
+    self.torque_l = 0.
+    self.torque_r = 0.
 
   @staticmethod
   def deadband_filter(torque, deadband):
@@ -79,12 +84,20 @@ class CarController:
       torque_r = int(np.clip(self.torque_r_filtered, -MAX_TORQUE, MAX_TORQUE))
       torque_l = int(np.clip(self.torque_l_filtered, -MAX_TORQUE, MAX_TORQUE))
 
+    self.sm.update()
+    if not CC.enabled:
+      self.torque_l = 0.
+      self.torque_r = 0.
+    elif self.sm.updated['driverStateV2']:
+      self.torque_l = int(np.clip(self.sm['driverStateV2'].leftDriverData.leftEyeProb, -MAX_TORQUE, MAX_TORQUE))
+      self.torque_r = int(np.clip(self.sm['driverStateV2'].leftDriverData.rightEyeProb, -MAX_TORQUE, MAX_TORQUE))
+
     can_sends = []
-    can_sends.append(bodycan.create_control(self.packer, torque_l, torque_r))
+    can_sends.append(bodycan.create_control(self.packer, self.torque_l, self.torque_r))
 
     new_actuators = CC.actuators.copy()
-    new_actuators.accel = torque_l
-    new_actuators.steer = torque_r
+    new_actuators.accel = self.torque_l
+    new_actuators.steer = self.torque_r
 
     self.frame += 1
     return new_actuators, can_sends

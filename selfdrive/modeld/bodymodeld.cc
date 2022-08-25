@@ -29,8 +29,10 @@ void run_model(BodyModelState &model, VisionIpcClient &vipc_client) {
       inputs[3] = sm["carState"].getCarState().getAEgo();
     }
     if (sm.updated("carControl")) {
-      inputs[4] = sm["carControl"].getCarControl().getOrientationNED()[1];
-      inputs[5] = sm["carControl"].getCarControl().getAngularVelocity()[1];
+      auto orientation = sm["carControl"].getCarControl().getOrientationNED();
+      auto angular_velocity = sm["carControl"].getCarControl().getAngularVelocity();
+      if (orientation.size() >= 2) { inputs[4] = orientation[1]; }
+      if (angular_velocity.size() >= 2) { inputs[5] = angular_velocity[1]; }
     }
 
     BodyModelResult res = bodymodel_eval_frame(&model, inputs);
