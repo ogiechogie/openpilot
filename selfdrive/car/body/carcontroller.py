@@ -86,11 +86,15 @@ class CarController:
 
     self.sm.update()
     if not CC.enabled:
+      print("CC not enabled")
       self.torque_l = 0.
       self.torque_r = 0.
     elif self.sm.updated['driverStateV2']:
+      print("SM updated, torque command:", self.sm['driverStateV2'].leftDriverData.leftEyeProb)
       self.torque_l = int(np.clip(self.sm['driverStateV2'].leftDriverData.leftEyeProb, -MAX_TORQUE, MAX_TORQUE))
       self.torque_r = int(np.clip(self.sm['driverStateV2'].leftDriverData.rightEyeProb, -MAX_TORQUE, MAX_TORQUE))
+    else:
+      print("SM not updated")
 
     can_sends = []
     can_sends.append(bodycan.create_control(self.packer, self.torque_l, self.torque_r))
