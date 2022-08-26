@@ -19,7 +19,7 @@ class CarController:
   def __init__(self, dbc_name, CP, VM):
     self.frame = 0
     self.packer = CANPacker(dbc_name)
-    self.sm = messaging.SubMaster(['driverStateV2'], poll=['driverStateV2'])
+    self.sm = messaging.SubMaster(['bodyModel'], poll=['bodyModel'])
 
     # Speed, balance and turn PIDs
     self.speed_pid = PIDController(0.115, k_i=0.23, rate=1/DT_CTRL)
@@ -85,27 +85,25 @@ class CarController:
       torque_l = int(np.clip(self.torque_l_filtered, -MAX_TORQUE, MAX_TORQUE))
 
     self.sm.update()
-    # if not CC.enabled:
-    #   print("CC not enabled")
-    #   self.torque_l = 0.
-    #   self.torque_r = 0.
-    if self.sm.updated['driverStateV2']:
-      print("SM updated, torque command:", self.sm['driverStateV2'].leftDriverData.leftEyeProb)
-      torque_l = self.sm['driverStateV2'].leftDriverData.leftEyeProb
-      torque_r = self.sm['driverStateV2'].leftDriverData.rightEyeProb
+    if not CC.enabled:
+      self.torque_l = 0.
+      self.torque_r = 0.
+    if self.sm.updated['bodyModel']:
+      torque_l = self.sm['bodyModel'].torqueLeft
+      torque_r = self.sm['bodyModel'].torqueRight
       self.torque_l = np.clip(self.deadband_filter(torque_l, 10), self.torque_l - MAX_TORQUE_RATE, self.torque_l + MAX_TORQUE_RATE)
       self.torque_r = np.clip(self.deadband_filter(torque_r, 10), self.torque_r - MAX_TORQUE_RATE, self.torque_r + MAX_TORQUE_RATE)
       self.torque_l = int(np.clip(self.torque_l, -MAX_TORQUE, MAX_TORQUE))
       self.torque_r = int(np.clip(self.torque_r, -MAX_TORQUE, MAX_TORQUE))
-    else:
-      print("SM not updated")
+
+    print("torque commands:", self.torque_l, torque_l, self.torque_r, torque_r)
 
     can_sends = []
-    can_sends.append(bodycan.create_control(self.packer, self.torque_l, self.torque_r))
+    can_sends.append(bodycan.create_control(self.packer, torque_l, torque_r))
 
     new_actuators = CC.actuators.copy()
-    new_actuators.accel = self.torque_l
-    new_actuators.steer = self.torque_r
+    new_actuators.accel = torque_l
+    new_actuators.steer = torque_r
 
     self.frame += 1
     return new_actuators, can_sends

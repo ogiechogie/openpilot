@@ -12,7 +12,7 @@
 ExitHandler do_exit;
 
 void run_model(BodyModelState &model, VisionIpcClient &vipc_client) {
-  PubMaster pm({"driverStateV2"});
+  PubMaster pm({"bodyModel"});
   SubMaster sm({"carState", "carControl"});
   float inputs[INPUT_SIZE];
 
@@ -35,16 +35,18 @@ void run_model(BodyModelState &model, VisionIpcClient &vipc_client) {
       if (angular_velocity.size() >= 2) { inputs[5] = angular_velocity[1]; }
     }
 
+    double t1 = millis_since_boot();
     BodyModelResult res = bodymodel_eval_frame(&model, inputs);
+    double t2 = millis_since_boot();
 
     // send dm packet
     MessageBuilder msg;
-    auto framed = msg.initEvent().initDriverStateV2();
-    auto data = framed.initLeftDriverData();
+    auto framed = msg.initEvent().initBodyModel();
     framed.setFrameId(extra.frame_id);
-    data.setLeftEyeProb(res.torque_left);
-    data.setRightEyeProb(res.torque_right);
-    pm.send("driverStateV2", msg);
+    framed.setModelExecutionTime((t2 - t1) / 1000.0);
+    framed.setTorqueLeft(res.torque_left);
+    framed.setTorqueRight(res.torque_right);
+    pm.send("bodyModel", msg);
   }
 }
 
