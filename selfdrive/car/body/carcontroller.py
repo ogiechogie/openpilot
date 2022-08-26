@@ -85,14 +85,18 @@ class CarController:
       torque_l = int(np.clip(self.torque_l_filtered, -MAX_TORQUE, MAX_TORQUE))
 
     self.sm.update()
-    if not CC.enabled:
-      print("CC not enabled")
-      self.torque_l = 0.
-      self.torque_r = 0.
-    elif self.sm.updated['driverStateV2']:
+    # if not CC.enabled:
+    #   print("CC not enabled")
+    #   self.torque_l = 0.
+    #   self.torque_r = 0.
+    if self.sm.updated['driverStateV2']:
       print("SM updated, torque command:", self.sm['driverStateV2'].leftDriverData.leftEyeProb)
-      self.torque_l = int(np.clip(self.sm['driverStateV2'].leftDriverData.leftEyeProb, -MAX_TORQUE, MAX_TORQUE))
-      self.torque_r = int(np.clip(self.sm['driverStateV2'].leftDriverData.rightEyeProb, -MAX_TORQUE, MAX_TORQUE))
+      torque_l = self.sm['driverStateV2'].leftDriverData.leftEyeProb
+      torque_r = self.sm['driverStateV2'].leftDriverData.rightEyeProb
+      self.torque_l = np.clip(self.deadband_filter(torque_l, 10), self.torque_l - MAX_TORQUE_RATE, self.torque_l + MAX_TORQUE_RATE)
+      self.torque_r = np.clip(self.deadband_filter(torque_r, 10), self.torque_r - MAX_TORQUE_RATE, self.torque_r + MAX_TORQUE_RATE)
+      self.torque_l = int(np.clip(self.torque_l, -MAX_TORQUE, MAX_TORQUE))
+      self.torque_r = int(np.clip(self.torque_r, -MAX_TORQUE, MAX_TORQUE))
     else:
       print("SM not updated")
 
