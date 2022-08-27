@@ -91,7 +91,6 @@ class Controls:
     else:
       self.CI, self.CP = CI, CI.CP
 
-    self.CI.CC.sm = sm
     params = Params()
     self.joystick_mode = params.get_bool("JoystickDebugMode") or (self.CP.notCar and sm is None)
     joystick_packet = ['testJoystick'] if self.joystick_mode else []
@@ -107,6 +106,7 @@ class Controls:
                                      'driverMonitoringState', 'longitudinalPlan', 'lateralPlan', 'liveLocationKalman',
                                      'managerState', 'liveParameters', 'radarState', 'bodyModel'] + self.camera_packets + joystick_packet,
                                     ignore_alive=ignore, ignore_avg_freq=['radarState', 'longitudinalPlan'])
+    self.CI.CC.sm = self.sm
 
     # set alternative experiences from parameters
     self.disengage_on_accelerator = params.get_bool("DisengageOnAccelerator")

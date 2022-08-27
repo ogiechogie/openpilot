@@ -86,8 +86,6 @@ class CarController:
     if not CC.enabled:
       self.torque_l = 0.
       self.torque_r = 0.
-    if self.sm is None:
-      print("NO SUBMASTER!!!")
     elif self.sm.updated['bodyModel']:
       model_torque_l = self.sm['bodyModel'].torqueLeft
       model_torque_r = self.sm['bodyModel'].torqueRight
@@ -98,11 +96,11 @@ class CarController:
       print("torque commands:", self.torque_l, torque_l, self.torque_r, torque_r)
 
     can_sends = []
-    can_sends.append(bodycan.create_control(self.packer, torque_l, torque_r))
+    can_sends.append(bodycan.create_control(self.packer, self.torque_l, self.torque_r))
 
     new_actuators = CC.actuators.copy()
-    new_actuators.accel = torque_l
-    new_actuators.steer = torque_r
+    new_actuators.accel = self.torque_l
+    new_actuators.steer = self.torque_r
 
     self.frame += 1
     return new_actuators, can_sends
