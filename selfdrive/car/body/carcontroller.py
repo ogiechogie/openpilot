@@ -1,6 +1,5 @@
 import numpy as np
 
-import cereal.messaging as messaging
 from common.realtime import DT_CTRL
 from opendbc.can.packer import CANPacker
 from selfdrive.car.body import bodycan
@@ -17,9 +16,9 @@ MAX_TURN_INTEGRATOR = 0.1  # meters
 
 class CarController:
   def __init__(self, dbc_name, CP, VM):
+    self.sm = None
     self.frame = 0
     self.packer = CANPacker(dbc_name)
-    self.sm = messaging.SubMaster(['bodyModel'], poll=['bodyModel'])
 
     # Speed, balance and turn PIDs
     self.speed_pid = PIDController(0.115, k_i=0.23, rate=1/DT_CTRL)
@@ -84,19 +83,19 @@ class CarController:
       torque_r = int(np.clip(self.torque_r_filtered, -MAX_TORQUE, MAX_TORQUE))
       torque_l = int(np.clip(self.torque_l_filtered, -MAX_TORQUE, MAX_TORQUE))
 
-    self.sm.update()
     if not CC.enabled:
       self.torque_l = 0.
       self.torque_r = 0.
-    if self.sm.updated['bodyModel']:
-      torque_l = self.sm['bodyModel'].torqueLeft
-      torque_r = self.sm['bodyModel'].torqueRight
-      self.torque_l = np.clip(self.deadband_filter(torque_l, 10), self.torque_l - MAX_TORQUE_RATE, self.torque_l + MAX_TORQUE_RATE)
-      self.torque_r = np.clip(self.deadband_filter(torque_r, 10), self.torque_r - MAX_TORQUE_RATE, self.torque_r + MAX_TORQUE_RATE)
+    if self.sm is None:
+      print("NO SUBMASTER!!!")
+    elif self.sm.updated['bodyModel']:
+      model_torque_l = self.sm['bodyModel'].torqueLeft
+      model_torque_r = self.sm['bodyModel'].torqueRight
+      self.torque_l = np.clip(self.deadband_filter(model_torque_l, 10), self.torque_l - MAX_TORQUE_RATE, self.torque_l + MAX_TORQUE_RATE)
+      self.torque_r = np.clip(self.deadband_filter(model_torque_r, 10), self.torque_r - MAX_TORQUE_RATE, self.torque_r + MAX_TORQUE_RATE)
       self.torque_l = int(np.clip(self.torque_l, -MAX_TORQUE, MAX_TORQUE))
       self.torque_r = int(np.clip(self.torque_r, -MAX_TORQUE, MAX_TORQUE))
-
-    print("torque commands:", self.torque_l, torque_l, self.torque_r, torque_r)
+      print("torque commands:", self.torque_l, torque_l, self.torque_r, torque_r)
 
     can_sends = []
     can_sends.append(bodycan.create_control(self.packer, torque_l, torque_r))
