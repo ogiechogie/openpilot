@@ -3,6 +3,7 @@ import os
 import time
 from abc import abstractmethod, ABC
 from typing import Any, Dict, Optional, Tuple, List
+from common.numpy_fast import interp
 
 from cereal import car
 from common.basedir import BASEDIR
@@ -10,7 +11,7 @@ from common.conversions import Conversions as CV
 from common.kalman.simple_kalman import KF1D
 from common.realtime import DT_CTRL
 from selfdrive.car import create_button_enable_events, gen_empty_fingerprint
-from selfdrive.controls.lib.drive_helpers import V_CRUISE_MAX
+from selfdrive.controls.lib.drive_helpers import V_CRUISE_MAX, apply_deadzone
 from selfdrive.controls.lib.events import Events
 from selfdrive.controls.lib.vehicle_model import VehicleModel
 
@@ -20,6 +21,7 @@ EventName = car.CarEvent.EventName
 MAX_CTRL_SPEED = (V_CRUISE_MAX + 4) * CV.KPH_TO_MS
 ACCEL_MAX = 2.0
 ACCEL_MIN = -3.5
+FRICTION_THRESHOLD = 0.2
 
 TORQUE_PARAMS_PATH = os.path.join(BASEDIR, 'selfdrive/car/torque_data/params.yaml')
 TORQUE_OVERRIDE_PATH = os.path.join(BASEDIR, 'selfdrive/car/torque_data/override.yaml')
@@ -100,6 +102,19 @@ class CarInterfaceBase(ABC):
 
   def get_steer_feedforward_function(self):
     return self.get_steer_feedforward_default
+
+  @staticmethod
+  def convert_latacc_to_torque_linear(error, pid_lat_accel, lateral_accel_deadzone, live_torque_params, v_ego):
+    # The default is a linear relationship between torque and lateral acceleration (accounting for road roll and steering friction)
+    friction_compensation = interp(
+      apply_deadzone(error, lateral_accel_deadzone),
+      [-FRICTION_THRESHOLD, FRICTION_THRESHOLD],
+      [-live_torque_params['friction'], live_torque_params['friction']]
+    )
+    return pid_lat_accel * live_torque_params['slope'] + friction_compensation
+
+  def convert_latacc_to_torque(self):
+    return self.convert_latacc_to_torque_linear
 
   # returns a set of default params to avoid repetition in car specific params
   @staticmethod
