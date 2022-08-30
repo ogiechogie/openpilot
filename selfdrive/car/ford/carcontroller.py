@@ -60,19 +60,10 @@ class CarController:
       # path angle is the car wheel angle, not the steering wheel angle
       path_angle = math.radians(apply_steer) / self.VM.sR
 
-      # Control torque applied by EPS
       # ramp rate: 0=Slow, 1=Medium, 2=Fast, 3=Immediately
-      # TODO: tune boundaries
-      if not bool(CS.out.steeringPressed):
-        ramp_type = 3
-      elif CS.out.steeringTorque < 0.5:
-        ramp_type = 2
-      elif CS.out.steeringTorque < 0.9:
-        ramp_type = 1
-      else:
-        ramp_type = 0
-
-      precision = 1  # 0=Comfortable, 1=Precise
+      # TODO: slower ramp speed when driver torque detected
+      ramp_type = 3  # 0=Slow, 1=Medium, 2=Fast, 3=Immediately
+      precision = 0  # 0=Comfortable, 1=Precise
 
       self.apply_steer_last = apply_steer
       can_sends.append(fordcan.create_lka_command(self.packer, apply_steer, 0))
