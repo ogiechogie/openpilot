@@ -20,8 +20,8 @@ class CarControllerParams:
   # Message: ACCDATA_3
   ACC_UI_STEP = 5
 
-  RATE_LIMIT_UP = AngleRateLimit(speed_points=[0., 5., 15.], max_angle_diff_points=[5., .8, .15])
-  RATE_LIMIT_DOWN = AngleRateLimit(speed_points=[0., 5., 15.], max_angle_diff_points=[5., 3.5, 0.4])
+  RATE_LIMIT_UP = AngleRateLimit(speed_points=[0., 5., 15.], max_angle_diff_points=[6., .96, .18])
+  RATE_LIMIT_DOWN = AngleRateLimit(speed_points=[0., 5., 15.], max_angle_diff_points=[6., 4.2, 0.48])
 
 
 class RADAR:
