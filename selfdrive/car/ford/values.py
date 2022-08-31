@@ -22,11 +22,13 @@ class CarControllerParams:
   # Message: ACCDATA_3
   ACC_UI_STEP = 5
 
-  STEER_RATIO = 2.9
-  STEER_DRIVER_ALLOWANCE = 0.8
-
-  RATE_LIMIT_UP = AngleRateLimit(speed_points=[0., 5., 15.], max_angle_diff_points=[6., .96, .18])
-  RATE_LIMIT_DOWN = AngleRateLimit(speed_points=[0., 5., 15.], max_angle_diff_points=[6., 4.2, 0.48])
+  STEER_MAX = 150                 # 150 = maybe 1.5 Nm? need to test
+  TORQUE_RATIO = (0.5 / STEER_MAX)
+  STEER_DRIVER_MULTIPLIER = 1
+  STEER_DRIVER_FACTOR = 1         # steering torque in Nm
+  STEER_DRIVER_ALLOWANCE = 0.8    # allow 0.8 Nm driver intervention
+  STEER_DELTA_UP = 3              # guessing these rate limits...
+  STEER_DELTA_DOWN = 5
 
 
 class RADAR:

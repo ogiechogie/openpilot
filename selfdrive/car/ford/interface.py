@@ -18,11 +18,15 @@ class CarInterface(CarInterfaceBase):
     ret.safetyConfigs = [get_safety_config(car.CarParams.SafetyModel.ford)]
     ret.dashcamOnly = candidate in (CAR.ESCAPE_MK4, CAR.FOCUS_MK4)  # need routes
 
-    # Angle-based steering
-    ret.steerControlType = car.CarParams.SteerControlType.angle
+    # Lateral tuning
     ret.steerActuatorDelay = 0.1
-    ret.steerLimitTimer = 1.0
+    ret.steerLimitTimer = 0.4
     tire_stiffness_factor = 1.0
+    ret.lateralTuning.pid.kpBP = [0.]
+    ret.lateralTuning.pid.kiBP = [0.]
+    ret.lateralTuning.pid.kf = 0.00006
+    ret.lateralTuning.pid.kpV = [0.6]
+    ret.lateralTuning.pid.kiV = [0.2]
 
     # Per-chassis tuning values, override tuning defaults here if desired
 
