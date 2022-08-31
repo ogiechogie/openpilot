@@ -3,7 +3,7 @@ from common.conversions import Conversions as CV
 from opendbc.can.can_define import CANDefine
 from opendbc.can.parser import CANParser
 from selfdrive.car.interfaces import CarStateBase
-from selfdrive.car.ford.values import CANBUS, DBC
+from selfdrive.car.ford.values import CANBUS, DBC, CarControllerParams
 
 GearShifter = car.CarState.GearShifter
 TransmissionType = car.CarParams.TransmissionType
@@ -37,7 +37,7 @@ class CarState(CarStateBase):
     # steering wheel
     ret.steeringAngleDeg = cp.vl["SteeringPinion_Data"]["StePinComp_An_Est"]
     ret.steeringTorque = cp.vl["EPAS_INFO"]["SteeringColumnTorque"]
-    ret.steeringPressed = cp.vl["Lane_Assist_Data3_FD1"]["LaHandsOff_B_Actl"] == 0
+    ret.steeringPressed = abs(ret.steeringTorque) > CarControllerParams.STEER_DRIVER_ALLOWANCE
     ret.steerFaultTemporary = cp.vl["EPAS_INFO"]["EPAS_Failure"] == 1
     ret.steerFaultPermanent = cp.vl["EPAS_INFO"]["EPAS_Failure"] in (2, 3)
     # ret.espDisabled = False  # TODO: find traction control signal
