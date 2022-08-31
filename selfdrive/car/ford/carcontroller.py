@@ -16,9 +16,9 @@ def apply_ford_steer_angle_limits(apply_angle, apply_angle_last, vEgo, VM):
   apply_angle = clip(apply_angle, (apply_angle_last - max_angle_diff), (apply_angle_last + max_angle_diff))
 
   # absolute limit (LatCtlPath_An_Actl)
-  apply_path_angle = math.radians(apply_angle) / VM.sR
+  apply_path_angle = math.radians(apply_angle) / CarControllerParams.STEER_RATIO
   apply_path_angle = clip(apply_path_angle, -0.4995, 0.5240)
-  apply_angle = math.degrees(apply_path_angle) * VM.sR
+  apply_angle = math.degrees(apply_path_angle) * CarControllerParams.STEER_RATIO
 
   return apply_angle
 
@@ -61,12 +61,12 @@ class CarController:
 
       # use LatCtlPath_An_Actl to actuate steering
       # path angle is the car wheel angle, not the steering wheel angle
-      path_angle = math.radians(apply_angle) / self.VM.sR
+      path_angle = math.radians(apply_angle) / CarControllerParams.STEER_RATIO
 
       # ramp rate: 0=Slow, 1=Medium, 2=Fast, 3=Immediately
       # TODO: slower ramp speed when driver torque detected
       ramp_type = 3  # 0=Slow, 1=Medium, 2=Fast, 3=Immediately
-      precision = 0  # 0=Comfortable, 1=Precise
+      precision = 1  # 0=Comfortable, 1=Precise
 
       self.apply_angle_last = apply_angle
       can_sends.append(fordcan.create_lka_command(self.packer, apply_angle, 0))
