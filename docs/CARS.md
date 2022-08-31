@@ -4,7 +4,7 @@
 
 A supported vehicle is one that just works when you install a comma three. All supported cars provide a better experience than any stock system.
 
-# 205 Supported Cars
+# 206 Supported Cars
 
 |Make|Model|Supported Package|ACC|No ACC accel below|No ALC below|Steering Torque|Resume from stop|Harness|
 |---|---|---|:---:|:---:|:---:|:---:|:---:|:---:|
@@ -27,6 +27,7 @@ A supported vehicle is one that just works when you install a comma three. All s
 |Chrysler|Pacifica Hybrid 2017-18|Adaptive Cruise Control|Stock|0 mph|9 mph|[![star](assets/icon-star-full.svg)](##)|[![star](assets/icon-star-full.svg)](##)|FCA|
 |Chrysler|Pacifica Hybrid 2019-22|Adaptive Cruise Control|Stock|0 mph|39 mph|[![star](assets/icon-star-full.svg)](##)|[![star](assets/icon-star-full.svg)](##)|FCA|
 |comma|body|All|Stock|0 mph|0 mph|[![star](assets/icon-star-full.svg)](##)|[![star](assets/icon-star-full.svg)](##)|None|
+|Ford|Explorer 2020-21|Co-Pilot360 Assist+|Stock|0 mph|0 mph|[![star](assets/icon-star-full.svg)](##)|[![star](assets/icon-star-full.svg)](##)|Ford Q3|
 |Genesis|G70 2018-19|All|Stock|0 mph|0 mph|[![star](assets/icon-star-full.svg)](##)|[![star](assets/icon-star-full.svg)](##)|Hyundai F|
 |Genesis|G70 2020|All|openpilot|0 mph|0 mph|[![star](assets/icon-star-full.svg)](##)|[![star](assets/icon-star-full.svg)](##)|Hyundai F|
 |Genesis|G80 2017-19|All|Stock|0 mph|0 mph|[![star](assets/icon-star-full.svg)](##)|[![star](assets/icon-star-full.svg)](##)|Hyundai H|
