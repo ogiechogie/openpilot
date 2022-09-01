@@ -100,6 +100,7 @@ class CarState(CarStateBase):
       ("Veh_V_DsplyCcSet", "EngBrakeData"),                  # PCM ACC set speed (mph)
                                                              # The units might change with IPC settings?
       ("CcStat_D_Actl", "EngBrakeData"),                     # PCM ACC status
+      ("AccStopMde_D_Rq", "EngBrakeData"),                   # PCM ACC standstill
       ("StePinComp_An_Est", "SteeringPinion_Data"),          # PSCM estimated steering angle (deg)
                                                              # Calculates steering angle (and offset) from pinion
                                                              # angle and driving measurements.
