@@ -29,8 +29,10 @@ def get_all_car_info() -> List[CarInfo]:
   all_car_info: List[CarInfo] = []
   footnotes = get_all_footnotes()
   for model, car_info in get_interface_attr("CAR_INFO", combine_brands=True).items():
-    # Hyundai exception: those with radar have openpilot longitudinal
     fingerprint = gen_empty_fingerprint()
+    # Ford exception: "automatic transmission" detection with Gear_Shift_by_Wire_FD1 message
+    fingerprint[0] = {0x5A: 8}
+    # Hyundai exception: those with radar have openpilot longitudinal
     fingerprint[1] = {HKG_RADAR_START_ADDR: 8}
     CP = interfaces[model][0].get_params(model, fingerprint=fingerprint, disable_radar=True)
 
