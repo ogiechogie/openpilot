@@ -108,7 +108,6 @@ class CarState(CarStateBase):
                                                              # to zero at the beginning of the drive.
       ("SteeringColumnTorque", "EPAS_INFO"),                 # PSCM steering column torque (Nm)
       ("EPAS_Failure", "EPAS_INFO"),                         # PSCM EPAS status
-      ("LaHandsOff_B_Actl", "Lane_Assist_Data3_FD1"),        # PSCM LKAS hands off wheel
       ("TurnLghtSwtch_D_Stat", "Steering_Data_FD1"),         # SCCM Turn signal switch
       ("TjaButtnOnOffPress", "Steering_Data_FD1"),           # SCCM ACC button, lane-centering/traffic jam assist toggle
       ("DrStatDrv_B_Actl", "BodyInfo_3_FD1"),                # BCM Door open, driver
